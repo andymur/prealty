@@ -1,0 +1,13 @@
+[Unit]
+Description=pycron service
+After=network.target
+#StartLimitIntervalSec=0
+
+[Service]
+#Restart=always
+#RestartSec=1
+User=antti
+ExecStart=/usr/bin/python3 /home/antti/workspace/prealty/cron.py
+
+[Install]
+WantedBy=default.target
