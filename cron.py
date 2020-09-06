@@ -11,13 +11,13 @@ def job():
     f.write(time.strftime("%Y-%m-%d %H:%M:%S") + "\n")
     f.close()
 
-schedule.every(5).seconds.do(job)
+schedule.every(1).hour.do(job)
 
 
 def main():
     while True:
         schedule.run_pending()
-        time.sleep(1)
+        time.sleep(300)
 
 if __name__ == "__main__":
     main()
