@@ -2,3 +2,4 @@ Script download all pages
 Process all pages data into basic apt information
 Pass all pages data and split to apt urls
 Download and pars apt url data
+Create env or better docker image for setup as the whole
