@@ -9,6 +9,7 @@ import os.path
 import logging
 
 # TODO: add standard argument handling
+# TODO: testing & mocking
 
 rooturl = 'https://www.domofond.ru'
 basedir = '/home/amurashko/prealty/'
