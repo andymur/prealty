@@ -6,8 +6,8 @@ import sys
 import time
 import re
 import os.path
+import logging
 
-# TODO: replace print statements with proper logging
 # TODO: add standard argument handling
 
 rooturl = 'https://www.domofond.ru'
@@ -48,6 +48,15 @@ def get_base_url(json_content):
     else:
         return None
 
+logger = logging.getLogger("template" if __name__ == "__main__" else __name__)
+logger.setLevel(logging.INFO)
+
+handler = logging.StreamHandler()
+formatter = logging.Formatter('%(name)s - %(levelname)s - %(message)s')
+
+handler.setFormatter(formatter)
+logger.addHandler(handler)
+
 if __name__ == "__main__":
     while True:
         page_number = get_page_number(baseurl)
@@ -57,10 +66,11 @@ if __name__ == "__main__":
         page_was_uploaded = False
 
         if not os.path.isfile(page_file):
-            print("uploading new page...")
+            logger.info("uploading new page from {}".format(baseurl))
             page = requests.get(baseurl, headers={'User-Agent': 'Mozilla'})
             page_content = page.text
-            print("storing html file..." + page_file)
+            logger.info("storing html file {}".format(page_file))
+            
             store_content(page_file, page_content)
             page_was_uploaded = True
         else:
@@ -69,10 +79,10 @@ if __name__ == "__main__":
         json_content = get_json(page_content)
 
         if not os.path.isfile(json_file) or page_was_uploaded:
-            print("storing json file..." + json_file)
+            logger.info("storing json file {}".format(json_file))
             store_content(json_file, json_content)
 
         baseurl = get_base_url(json_content)
         if not baseurl:
-            print("end of work...")
+            logger.info("End of work...")
             break
