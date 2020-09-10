@@ -1,30 +1,52 @@
 #!/usr/bin/python3
+
+import argparse
 import json
+import csv
+import os
+import os.path
 
-#jsobj["itemsState"]["items"][0]["priceValue"]
-#/home/amurashko/prealty/belgorod-2020-09-08-1.json
+def append_data(basedir, jsonfilename, csvfilename):
+    jsonfile = os.path.sep.join((basedir, jsonfilename))
+    csvfile = os.path.sep.join((basedir, csvfilename))
+    with open(jsonfile) as fjson, open(csvfile, "a") as fcsv:
+        fieldnames = ["id", "price", "published", "updated", "title", "floor", "details", "description", 
+                      "url", "rooms", "isfreeplan", "location", "address", "agency_id", "agency_name", 
+                      "source_started", "source_finished", "sale_type"]
+        csvwriter = csv.DictWriter(fcsv, fieldnames = fieldnames)
+        json_content = fjson.read()
+        obj = json.loads(json_content)
+        for item in obj["itemsState"]["items"]:
+            ditem = {}
+            ditem["id"] = item["id"]
+            ditem["price"] = item["priceValue"]
+            ditem["published"] = item["publishDate"]
+            ditem["updated"] = item["sourceUpdateTime"]
+            ditem["title"] = item["title"]
+            ditem["floor"] = item["floorInt"]
+            ditem["details"] = item["details"]
+            ditem["description"] = item["description"]
+            ditem["url"] = item["itemUrl"]
+            ditem["rooms"] = item.get("roomsOrdinal", None)
+            ditem["isfreeplan"] = item["isFreePlan"]
+            ditem["location"] = item.get("location", None)
+            ditem["address"] = item["address"]
+            ditem["agency_id"] = item["agencyId"]
+            ditem["agency_name"] = item["agencyName"]
+            ditem["source_started"] = item["sourceStartTime"]
+            ditem["source_finished"] = item["sourceFinishTime"]
+            ditem["sale_type"] = item["apartmentSaleType"]
+            csvwriter.writerow(ditem)
 
-filename = "/home/amurashko/prealty/belgorod-2020-09-08-1.json"
-with open(filename) as f:
-    json_content = f.read()
-    obj = json.loads(json_content)
-    for item in obj["itemsState"]["items"]:
-        id = item["id"]
-        price = item["priceValue"]
-        published = item["publishDate"]
-        updated = item["sourceUpdateTime"]
-        title = item["title"]
-        floor = item["floorInt"]
-        details = item["details"]
-        description = item["description"]
-        url = item["itemUrl"]
-        rooms = item["roomsOrdinal"]
-        isfreeplan = item["isFreePlan"]
-        location = item["location"]
-        address = item["address"]
-        agency_id = item["agencyId"]
-        agency_name = item["agencyName"]
-        source_started = item["sourceStartTime"]
-        source_finished = item["sourceFinishTime"]
-        sale_type = item["apartmentSaleType"]
-        print("{:40}\t{}\t{}\t{}".format(title, price, published, updated))
+
+csvfilename = "prealty.csv"
+
+argparser = argparse.ArgumentParser()
+argparser.add_argument("-b", "--basedir", type=str, required=True)
+
+args = argparser.parse_args()
+basedir = args.basedir
+
+for jsonfilename in list(filter(lambda x: x.endswith("json"), os.listdir(basedir))):
+    append_data(basedir, jsonfilename, csvfilename)
+    os.rename(os.path.sep.join((basedir, jsonfilename)), os.path.sep.join((basedir, jsonfilename + "_")))
