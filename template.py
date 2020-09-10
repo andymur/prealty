@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 
+import argparse
 import requests
 import json
 import sys
@@ -8,17 +9,7 @@ import re
 import os.path
 import logging
 
-# TODO: add standard argument handling
 # TODO: testing & mocking
-
-rooturl = 'https://www.domofond.ru'
-basedir = '/home/amurashko/prealty/'
-
-if len(sys.argv) > 1:
-    baseurl = rooturl + sys.argv[1]
-else:
-    baseurl = rooturl + '/prodazha-kvartiry-belgorod-c310?PublicationTimeRange=OneDay'
-
 
 def construct_whole_page_filename(basedir, pagenumber):
     return "{0}belgorod-{1}-{2}.html".format(basedir, time.strftime("%Y-%m-%d"), pagenumber)
@@ -48,6 +39,21 @@ def get_base_url(json_content):
         return rooturl + page_object['metaInformationState']['current']['nextLink']
     else:
         return None
+
+argparser = argparse.ArgumentParser()
+argparser.add_argument("-b", "--basedir", type=str, required=True)
+argparser.add_argument("-u", "--urlending", type=str, required=False)
+
+args = argparser.parse_args()
+urlending = args.urlending
+
+rooturl = 'https://www.domofond.ru'
+basedir = args.basedir
+
+if urlending:
+    baseurl = rooturl + sys.argv[1]
+else:
+    baseurl = rooturl + '/prodazha-kvartiry-belgorod-c310?PublicationTimeRange=OneDay'
 
 logger = logging.getLogger("template" if __name__ == "__main__" else __name__)
 logger.setLevel(logging.INFO)
